@@ -33,9 +33,8 @@
 
 # Visual Studio files
 /.vs/**
+*.db
 
 # Build Files
 /x64/**
 /HelloEngine/x64/**
-*.db
-*.db
