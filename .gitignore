@@ -32,4 +32,10 @@
 *.app
 
 # Visual Studio files
-/.vs/*
+/.vs/**
+
+# Build Files
+/x64/**
+/HelloEngine/x64/**
+*.db
+*.db

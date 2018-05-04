@@ -14,4 +14,14 @@
       <UniqueIdentifier>{40b56470-18c8-4bac-b223-fddefaf30590}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Core\Source.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Core\HighestHeader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
