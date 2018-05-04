@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{60cbf55f-86c9-418f-a56a-d3998c3dff09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{4a562fce-4ef1-47c8-afc4-4ecad10bd515}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Inc">
+      <UniqueIdentifier>{6ee5c202-d569-400f-9402-da306d73fe30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Src">
+      <UniqueIdentifier>{40b56470-18c8-4bac-b223-fddefaf30590}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
