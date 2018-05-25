@@ -13,15 +13,39 @@
     <Filter Include="Rendering\Src">
       <UniqueIdentifier>{40b56470-18c8-4bac-b223-fddefaf30590}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{6e5b84d2-374b-4903-a19f-c63d7270017b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Src">
+      <UniqueIdentifier>{b93d71da-b34c-4fdc-a92a-3f6ad3a943c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Inc">
+      <UniqueIdentifier>{783bcb4f-293b-4e3c-ab92-203f8030705f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Source.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Windows\Src\WindowsWindow.cpp">
+      <Filter>Windows\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Windows\Src\WindowsMain.cpp">
+      <Filter>Windows\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Src\d3d11.cpp">
+      <Filter>Rendering\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\HighestHeader.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Windows\Inc\WindowsWindow.h">
+      <Filter>Windows\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Inc\d3d11.h">
+      <Filter>Rendering\Inc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,11 +2,11 @@
 
 #include <stdio.h>
 
-void main( void )
+int main()
 {
 	int TestInt = 2;
 	
 	printf( "Well Lol\n" );
 
-	return;
+	return TestInt;
 }
