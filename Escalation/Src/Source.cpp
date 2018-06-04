@@ -506,7 +506,8 @@ int main( void )
 
 	// THREAD THESE UP
 
-	const int numRuns = 10000;
+	const int numRuns = 20000;
+	const int runPerPercent = numRuns / 100;
 
 	for ( int runIndex = 0; runIndex < numRuns; runIndex++ )
 	{
@@ -526,9 +527,9 @@ int main( void )
 			maxRounds = maxRounds > numRoundsSimmed ? maxRounds : numRoundsSimmed;
 		}
 
-		if ( ( runIndex % 100 ) == 0 )
+		if ( ( runIndex % runPerPercent ) == 0 )
 		{
-			std::cout << runIndex / 100 << "% complete..." << std::endl;
+			std::cout << runIndex / runPerPercent << "% complete..." << std::endl;
 		}
 	}
 
