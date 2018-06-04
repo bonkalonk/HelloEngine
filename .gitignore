@@ -37,4 +37,5 @@
 
 # Build Files
 /x64/**
+*/x64/**
 /HelloEngine/x64/**
