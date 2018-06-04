@@ -118,7 +118,7 @@ public:
 
 	bool IsEmpty() const
 	{
-		return ( _drawPile.size() == 0 ) && ( _discardPile.size() == 0 );
+		return ( _drawPile.size() == 0 );
 	}
 
 protected:
@@ -242,53 +242,68 @@ struct Player
 	{
 		assert( availableCards.size() >= 2 );
 
-		int cardToPlayIndex = 0;
-		int cardToDiscardIndex = 1;
+		struct CardInfo
+		{
+			CardInfo( int index, std::vector<Deck::Card>& availableCards )
+				: _cardIndex( index )
+				, _cardValue( availableCards[ index ]->Value() )
+			{}
+
+			void Set( int index, int value )
+			{
+				_cardIndex = index;
+				_cardValue = value;
+			}
+
+			int _cardIndex;
+			int _cardValue;
+		};
+
+		CardInfo cardToPlay{ 0, availableCards };
+		CardInfo cardToDiscard{ 1, availableCards };
 
 		for ( int i = 0; i < availableCards.size(); ++i )
 		{
-			const Deck::Card& cardToPlay = availableCards[ cardToPlayIndex ];
-			const Deck::Card& cardToDiscard = availableCards[ cardToDiscardIndex ];
-
 			const Deck::Card& card = availableCards[ i ];
+			const int cardValue = card->Value();
 
 			const bool shouldPlayCard = [&]
 			{
-				return _isSab ? ( card->Value() > cardToPlay->Value() ) : ( card->Value() < cardToPlay->Value() );
+				return _isSab ? ( cardValue > cardToPlay._cardValue ) : ( cardValue < cardToPlay._cardValue );
 			}( );
 
 			const bool shouldDiscardCard = [&]
 			{
-				return _isSab ? ( card->Value() < cardToDiscard->Value() ) : ( card->Value() > cardToDiscard->Value() );
+				return _isSab ? ( cardValue < cardToDiscard._cardValue ) : ( cardValue > cardToDiscard._cardValue );
 			}( );
 
 			if ( shouldPlayCard )
 			{
-				cardToPlayIndex = i;
+				cardToPlay.Set( i, cardValue );
 			}
 
 			if ( shouldDiscardCard )
 			{
-				cardToDiscardIndex = i;
+				cardToDiscard.Set( i, cardValue );
 			}
 		}
 
-		assert( cardToPlayIndex != cardToDiscardIndex );
+		assert( cardToPlay._cardIndex != cardToDiscard._cardIndex );
 
 		auto PlayCard = [&]
 		{
-			currentEvent.PlayCard( *(availableCards.begin() + cardToPlayIndex) );
+			currentEvent.PlayCard( *( availableCards.begin() + cardToPlay._cardIndex ) );
 
-			availableCards.erase( availableCards.begin() + cardToPlayIndex );
+			availableCards.erase( availableCards.begin() + cardToPlay._cardIndex );
 		};
 
 		auto DiscardCard = [&]
 		{
-			availableCards.erase( availableCards.begin() + cardToDiscardIndex );
+			availableCards.erase( availableCards.begin() + cardToDiscard._cardIndex );
 		};
 
 		// dirty but..
-		if ( cardToPlayIndex < cardToDiscardIndex )
+		if ( cardToPlay._cardIndex < cardToDiscard._cardIndex )
 		{
 			DiscardCard();
 			PlayCard();
@@ -302,34 +317,34 @@ struct Player
 
 	void AssignCard( std::vector<Deck::Card>& availableCards, std::vector<Hazard>& currentHazards, Deck& timeDeck ) const
 	{
-	assert( currentHazards.size() != 0 );
+		assert( currentHazards.size() != 0 );
 
-	Deck::Card& lastCard = availableCards.back();
+		Deck::Card& lastCard = availableCards.back();
 
-	Hazard* bestHazard = [&]
-	{
-		Hazard* matchingHazard = nullptr;
-		for ( Hazard& hazard : currentHazards )
+		Hazard* bestHazard = [&]
 		{
-			if ( hazard.WillComplete( lastCard ) )
+			Hazard* matchingHazard = nullptr;
+			for ( Hazard& hazard : currentHazards )
 			{
-				return &hazard;
+				if ( hazard.WillComplete( lastCard ) )
+				{
+					return &hazard;
+				}
+				else if ( ( matchingHazard == nullptr ) && hazard.CanPlay( lastCard ) )
+				{
+					matchingHazard = &hazard;
+				}
 			}
-			else if ( ( matchingHazard == nullptr ) && hazard.CanPlay( lastCard ) )
-			{
-				matchingHazard = &hazard;
-			}
+			return matchingHazard;
+		}( );
+
+		if ( bestHazard )
+		{
+			int hazardValuePreCard = bestHazard->GetCurrentValue();
+			bestHazard->PlayCard( lastCard );
 		}
-		return matchingHazard;
-	}( );
 
-	if ( bestHazard )
-	{
-		int hazardValuePreCard = bestHazard->GetCurrentValue();
-		bestHazard->PlayCard( lastCard );
-	}
-
-	availableCards.pop_back();
+		availableCards.pop_back();
 	}
 
 protected:
@@ -348,10 +363,10 @@ struct EscalationGame
 		_timeDeck.AddCards( 4, 5 );
 		_timeDeck.AddCards( 5, 5 );
 
-		_eventDeck.AddCards( 6, 4 );
-		_eventDeck.AddCards( 7, 4 );
-		_eventDeck.AddCards( 8, 4 );
-		_eventDeck.AddCards( 9, 4 );
+		_eventDeck.AddCards( 6, 2 );
+		_eventDeck.AddCards( 7, 2 );
+		_eventDeck.AddCards( 8, 2 );
+		_eventDeck.AddCards( 9, 2 );
 
 		_players.push_back( false );
 		_players.push_back( false );
@@ -381,7 +396,7 @@ struct EscalationGame
 			int playerIndex = ( i + _firstPlayerIndex ) % _players.size();
 			const Player& player = _players[ playerIndex ];
 
-			//timeCards.insert( timeCards.begin(), _timeDeck.DrawCard() );
+			timeCards.push_back( _timeDeck.DrawCard() );
 			player.SelectCard( timeCards, roundEvent, _timeDeck );
 		}
 
@@ -455,7 +470,7 @@ struct EscalationGame
 
 	int GetNumCardsToDraw() const
 	{
-		return (int)( _players.size() * 2 ) + 2;
+		return (int)( _players.size() * 1 ) + 1;
 	}
 
 protected:
@@ -497,9 +512,9 @@ struct EscalationSimulation
 		}
 	}
 
-	int GetResultAsIndex() const
+	EscalationGame::GameState GetGameState() const
 	{
-		return (int)_currentGameState;
+		return _currentGameState;
 	}
 
 	int GetNumRounds() const
@@ -516,6 +531,7 @@ protected:
 
 int main( void )
 {
+	std::cout << "Starting sims..." << std::endl;
 	srand( (unsigned int)time( NULL ) );
 
 	const unsigned int numResultTypes = (int)EscalationGame::GameState::MAX;
@@ -523,7 +539,7 @@ int main( void )
 	int numRounds = 0;
 	int minRounds = 100;
 	int maxRounds = 0;
-	
+
 	// THREAD THESE UP
 
 	const int numRuns = 10000;
@@ -533,12 +549,23 @@ int main( void )
 		EscalationSimulation sim;
 		sim.Run();
 
-		numResults[ sim.GetResultAsIndex() ]++;
+		EscalationGame::GameState gameEndState = sim.GetGameState();
+
+		numResults[ (int)gameEndState ]++;
 		const int numRoundsSimmed = sim.GetNumRounds();
 
 		numRounds += numRoundsSimmed;
 		minRounds = minRounds < numRoundsSimmed ? minRounds : numRoundsSimmed;
-		maxRounds = maxRounds > numRoundsSimmed ? maxRounds : numRoundsSimmed;
+
+		if ( gameEndState != EscalationGame::GameState::EventDeckOut )
+		{
+			maxRounds = maxRounds > numRoundsSimmed ? maxRounds : numRoundsSimmed;
+		}
+
+		if ( ( runIndex % 100 ) == 0 )
+		{
+			std::cout << runIndex / 100 << "% complete..." << std::endl;
+		}
 	}
 
 	float resultPercentages[ numResultTypes ] = { 0, 0, 0 };
