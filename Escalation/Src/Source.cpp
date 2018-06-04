@@ -10,12 +10,12 @@ const int NumStartingHazards = 2;
 const int NumHazardsForCrewWin = 0;
 const int NumHazardsForSabWin = 4;
 
-template < typename VectorType, typename Func >
-void ForEach( VectorType& vector, Func func )
+template < typename ContainerType, typename Func >
+void ForEach( ContainerType& vector, Func func )
 {
-	for ( auto It = vector.begin(); It < vector.end(); ++It )
+	for ( auto& It : vector )
 	{
-		func( *It );
+		func( It );
 	}
 }
 
@@ -48,7 +48,7 @@ public:
 
 	struct CardRef
 	{
-		CardRef( const CardData& card, Deck& deck ) : _card( card ), _deck( deck ) {}
+		CardRef( const CardData& card, Deck& deck ) : _cardData( card ), _deck( deck ) {}
 		CardRef( const CardRef& other ) = delete;
 		CardRef( const CardRef&& other ) = delete;
 		void operator = ( const CardRef& other ) = delete;
@@ -56,21 +56,21 @@ public:
 
 		~CardRef()
 		{
-			_deck.DiscardCard( _card );
+			_deck.DiscardCard( _cardData );
 		}
 
 		int Value() const
 		{
-			return _card._value;
+			return _cardData._value;
 		}
 
 		bool operator == ( const CardRef& other ) const
 		{
-			return _card == other._card;
+			return _cardData == other._cardData;
 		}
 
 	protected:
-		CardData _card;
+		CardData _cardData;
 		Deck& _deck;
 	};
 
@@ -106,7 +106,7 @@ public:
 	{
 		_discardPile.push_back( discardCard );
 
-		assert( std::find_if( _uniqueIds.begin(), _uniqueIds.end(), [&]( const int& other ) { return other == discardCard._uniqueId; } ) != _uniqueIds.end() );
+		assert( std::find( _uniqueIds.begin(), _uniqueIds.end(), discardCard._uniqueId ) != _uniqueIds.end() );
 	}
 
 	void FillDrawPile()
@@ -160,9 +160,9 @@ protected:
 template < typename EventSpecificsPolicy >
 struct EventCard : EventSpecificsPolicy
 {
-	EventCard( Deck::Card eventCard, Deck& sourceDeck ) : _eventCard( std::move( eventCard ) ), _sourceDeck( &sourceDeck ) {}
+	EventCard( Deck::Card eventCard ) : _eventCard( std::move( eventCard ) ) {}
 
-	void PlayCard( Deck::Card& card )
+	void PlayCard( Deck::Card card )
 	{
 		assert( CanPlay( card ) );
 
@@ -218,7 +218,6 @@ struct EventCard : EventSpecificsPolicy
 protected:
 	Deck::Card _eventCard;
 	std::vector<Deck::Card> _timeCards;
-	Deck* _sourceDeck;
 
 	friend struct Hazard;
 };
@@ -231,7 +230,7 @@ struct Event : EventCard<RoundPolicy>
 struct Hazard : EventCard<HazardPolicy>
 {
 	using EventCard<HazardPolicy>::EventCard;
-	Hazard( Event&& event ) : EventCard<HazardPolicy>( std::move( event._eventCard ), *event._sourceDeck ) {}
+	Hazard( Event&& event ) : EventCard<HazardPolicy>( std::move( event._eventCard ) ) {}
 };
 
 struct Player
@@ -267,15 +266,8 @@ struct Player
 			const Deck::Card& card = availableCards[ i ];
 			const int cardValue = card->Value();
 
-			const bool shouldPlayCard = [&]
-			{
-				return _isSab ? ( cardValue > cardToPlay._cardValue ) : ( cardValue < cardToPlay._cardValue );
-			}( );
-
-			const bool shouldDiscardCard = [&]
-			{
-				return _isSab ? ( cardValue < cardToDiscard._cardValue ) : ( cardValue > cardToDiscard._cardValue );
-			}( );
+			const bool shouldPlayCard = _isSab ? ( cardValue > cardToPlay._cardValue ) : ( cardValue < cardToPlay._cardValue );
+			const bool shouldDiscardCard = _isSab ? ( cardValue < cardToDiscard._cardValue ) : ( cardValue > cardToDiscard._cardValue );
 
 			if ( shouldPlayCard )
 			{
@@ -290,29 +282,9 @@ struct Player
 
 		assert( cardToPlay._cardIndex != cardToDiscard._cardIndex );
 
-		auto PlayCard = [&]
-		{
-			currentEvent.PlayCard( *( availableCards.begin() + cardToPlay._cardIndex ) );
-
-			availableCards.erase( availableCards.begin() + cardToPlay._cardIndex );
-		};
-
-		auto DiscardCard = [&]
-		{
-			availableCards.erase( availableCards.begin() + cardToDiscard._cardIndex );
-		};
-
-		// dirty but..
-		if ( cardToPlay._cardIndex < cardToDiscard._cardIndex )
-		{
-			DiscardCard();
-			PlayCard();
-		}
-		else
-		{
-			PlayCard();
-			DiscardCard();
-		}
+		currentEvent.PlayCard( std::move( *( availableCards.begin() + cardToPlay._cardIndex ) ) );
+		availableCards.erase( availableCards.begin() + std::max( cardToPlay._cardIndex, cardToDiscard._cardIndex ) );
+		availableCards.erase( availableCards.begin() + std::min( cardToPlay._cardIndex, cardToDiscard._cardIndex ) );
 	}
 
 	void AssignCard( std::vector<Deck::Card>& availableCards, std::vector<Hazard>& currentHazards, Deck& timeDeck ) const
@@ -341,7 +313,7 @@ struct Player
 		if ( bestHazard )
 		{
 			int hazardValuePreCard = bestHazard->GetCurrentValue();
-			bestHazard->PlayCard( lastCard );
+			bestHazard->PlayCard( std::move( lastCard ) );
 		}
 
 		availableCards.pop_back();
@@ -368,27 +340,27 @@ struct EscalationGame
 		_eventDeck.AddCards( 8, 2 );
 		_eventDeck.AddCards( 9, 2 );
 
-		_players.push_back( false );
-		_players.push_back( false );
-		_players.push_back( false );
-		_players.push_back( true );
+		_players.emplace_back( false );
+		_players.emplace_back( false );
+		_players.emplace_back( false );
+		_players.emplace_back( true );
 
 		for ( int i = 0; i < NumStartingHazards; ++i )
 		{
-			_currentHazards.push_back( Hazard( _eventDeck.DrawCard(), _eventDeck ) );
+			_currentHazards.emplace_back( _eventDeck.DrawCard() );
 		}
 	}
 
 	void PlayRound( int roundNum )
 	{
-		Event roundEvent( _eventDeck.DrawCard(), _eventDeck );
+		Event roundEvent( _eventDeck.DrawCard() );
 
 		const int numCardsToDraw = GetNumCardsToDraw();
 		std::vector<Deck::Card> timeCards;
 
 		for ( int i = 0; i < numCardsToDraw; ++i )
 		{
-			timeCards.push_back( _timeDeck.DrawCard() );
+			timeCards.emplace_back( _timeDeck.DrawCard() );
 		}
 
 		for ( int i = 0; i < _players.size(); ++i )
@@ -396,7 +368,7 @@ struct EscalationGame
 			int playerIndex = ( i + _firstPlayerIndex ) % _players.size();
 			const Player& player = _players[ playerIndex ];
 
-			timeCards.push_back( _timeDeck.DrawCard() );
+			timeCards.emplace_back( _timeDeck.DrawCard() );
 			player.SelectCard( timeCards, roundEvent, _timeDeck );
 		}
 
@@ -437,15 +409,7 @@ struct EscalationGame
 
 	int GetNumInPlayHazards() const
 	{
-		int numHazards = 0;
-		for ( const Hazard& hazard : _currentHazards )
-		{
-			if ( hazard.IsComplete() == false )
-			{
-				numHazards++;
-			}
-		}
-		return numHazards;
+		return (int)_currentHazards.size();
 	}
 
 	GameState GetCurrentGameState() const
