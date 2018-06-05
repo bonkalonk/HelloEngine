@@ -64,99 +64,99 @@ auto CallWhile( VALIDATOR validator, FUNC firstFunc, FUNCS... additionalFuncs )
 
 D3d11Interface::D3d11Interface()
 {
-	constexpr bool bUsingTheBadWay = true;
-
-	if ( bUsingTheBadWay == true )
-	{
-		HRESULT result;
-		IDXGIFactory* dxgiFactory = nullptr;
-		IDXGIAdapter* dxgiAdapter = nullptr;
-		IDXGIOutput* dxgiOutput = nullptr;
-		uint numModes, i, numerator, denominator, stringLength;
-		DXGI_MODE_DESC* displayModeList = nullptr;
-		DXGI_ADAPTER_DESC adapterDesc;
-		int error;
-		DXGI_SWAP_CHAIN_DESC swapChainDesc;
-		D3D_FEATURE_LEVEL featureLevel;
-		//ID3D11Texture2D* backBufferPtr = nullptr;
-		//D3D11_TEXTURE2D_DESC depthBufferDesc;
-		//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-		//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-		//D3D11_RASTERIZER_DESC rasterDesc;
-		//D3D11_VIEWPORT viewport;
-		float fieldOfView, screenAspect;
-		
-		result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
-
-		if ( FAILED( result ) )
-		{
-			return;
-		}
-
-		result = dxgiFactory->EnumAdapters( 0, &dxgiAdapter );
-
-		if ( FAILED( result ) )
-		{
-			return;
-		}
-
-		result = dxgiAdapter->EnumOutputs( 0, &dxgiOutput );
-
-		if ( FAILED( result ) )
-		{
-			return;
-		}
-
-		result = dxgiOutput->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr );
-
-		if ( FAILED( result ) || ( numModes == 0 ) )
-		{
-			return;
-		}
-
-		displayModeList = new DXGI_MODE_DESC[ numModes ];
-
-		if ( displayModeList == nullptr )
-		{
-			return;
-		}
-
-		// wtf support is not easy =]
-
-		/// And so on...
-	}
-
-
-	if ( bUsingTheBadWay == false )
-	{
-		/*HRESULT result;
-		auto CheckThatFunctionWorked = [&result]
-		{
-			return FAILED( result ) == false;
-		};
-
-
-		IDXGIFactory* dxgiFactory = nullptr;
-		IDXGIAdapter* dxgiAdapter = nullptr;
-
-		auto CreateFactory = [&result] -> union { HRESULT, IDXGIFactory* };
-		{
-			result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
-		};
-
-		auto EnumerateAdapters = [&result, &dxgiFactory, &dxgiAdapter]
-		{
-			result = dxgiFactory->EnumAdapters( 0, &dxgiAdapter );
-		};
-
-		SequentialCaller andThen;
-
-
-		andThen( CreateFactory, CheckThatFunctionWorked );
-		andThen( EnumerateAdapters, CheckThatFunctionWorked );
-		andThen( EnumerateAdapters, []()
-		{
-			return false;
-		} );*/
-	}
+	//constexpr bool bUsingTheBadWay = true;
+	//
+	//if ( bUsingTheBadWay == true )
+	//{
+	//	HRESULT result;
+	//	IDXGIFactory* dxgiFactory = nullptr;
+	//	IDXGIAdapter* dxgiAdapter = nullptr;
+	//	IDXGIOutput* dxgiOutput = nullptr;
+	//	uint numModes, i, numerator, denominator, stringLength;
+	//	DXGI_MODE_DESC* displayModeList = nullptr;
+	//	DXGI_ADAPTER_DESC adapterDesc;
+	//	int error;
+	//	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	//	D3D_FEATURE_LEVEL featureLevel;
+	//	//ID3D11Texture2D* backBufferPtr = nullptr;
+	//	//D3D11_TEXTURE2D_DESC depthBufferDesc;
+	//	//D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	//	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	//	//D3D11_RASTERIZER_DESC rasterDesc;
+	//	//D3D11_VIEWPORT viewport;
+	//	float fieldOfView, screenAspect;
+	//	
+	//	result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
+	//
+	//	if ( FAILED( result ) )
+	//	{
+	//		return;
+	//	}
+	//
+	//	result = dxgiFactory->EnumAdapters( 0, &dxgiAdapter );
+	//
+	//	if ( FAILED( result ) )
+	//	{
+	//		return;
+	//	}
+	//
+	//	result = dxgiAdapter->EnumOutputs( 0, &dxgiOutput );
+	//
+	//	if ( FAILED( result ) )
+	//	{
+	//		return;
+	//	}
+	//
+	//	result = dxgiOutput->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr );
+	//
+	//	if ( FAILED( result ) || ( numModes == 0 ) )
+	//	{
+	//		return;
+	//	}
+	//
+	//	displayModeList = new DXGI_MODE_DESC[ numModes ];
+	//
+	//	if ( displayModeList == nullptr )
+	//	{
+	//		return;
+	//	}
+	//
+	//	// wtf support is not easy =]
+	//
+	//	/// And so on...
+	//}
+	//
+	//
+	//if ( bUsingTheBadWay == false )
+	//{
+	//	/*HRESULT result;
+	//	auto CheckThatFunctionWorked = [&result]
+	//	{
+	//		return FAILED( result ) == false;
+	//	};
+	//
+	//
+	//	IDXGIFactory* dxgiFactory = nullptr;
+	//	IDXGIAdapter* dxgiAdapter = nullptr;
+	//
+	//	auto CreateFactory = [&result] -> union { HRESULT, IDXGIFactory* };
+	//	{
+	//		result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
+	//	};
+	//
+	//	auto EnumerateAdapters = [&result, &dxgiFactory, &dxgiAdapter]
+	//	{
+	//		result = dxgiFactory->EnumAdapters( 0, &dxgiAdapter );
+	//	};
+	//
+	//	SequentialCaller andThen;
+	//
+	//
+	//	andThen( CreateFactory, CheckThatFunctionWorked );
+	//	andThen( EnumerateAdapters, CheckThatFunctionWorked );
+	//	andThen( EnumerateAdapters, []()
+	//	{
+	//		return false;
+	//	} );*/
+	//}
 }
