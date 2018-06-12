@@ -127,7 +127,6 @@
   <ItemGroup>
     <ClInclude Include="Inc\Deck.h" />
     <ClInclude Include="Inc\Escalation_v1.h" />
-    <ClInclude Include="Inc\Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,9 +25,6 @@
     <ClInclude Include="Inc\Deck.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Utility.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Escalation_v1.h">
       <Filter>Inc</Filter>
     </ClInclude>

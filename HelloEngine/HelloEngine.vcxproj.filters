@@ -47,5 +47,8 @@
     <ClInclude Include="Source\Rendering\Inc\d3d11.h">
       <Filter>Rendering\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\Utility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <assert.h>
 #include <vector>
 
 #include "Deck.h"
-#include "Utility.h"
+// todo : fix
+#include "../../HelloEngine/Source/Core/Utility.h"
 
 namespace Escalation_v1
 {

@@ -1,27 +1,30 @@
 #pragma once
 
 #include "HighestHeader.h"
+#include "Utility.h"
 
 #include "d3d11.h"
 
-#include <stdio.h>
+#include <assert.h>
 #include <iostream>
+#include <stdio.h>
+
+//#include <optional>
 
 struct SequentialCaller
 {
-	//using VerifyFunc = bool( void );
+	// using VerifyFunc = bool( void );
 
 	SequentialCaller() = default;
 
-	template < typename Func, typename VerifyFunc >
+	template <typename Func, typename VerifyFunc>
 	SequentialCaller( Func func, VerifyFunc verify )
 	{
 		( *this )( func, verify );
 	}
 
-
-	template < typename Func, typename VerifyFunc >
-	void operator() ( Func func, VerifyFunc verify )
+	template <typename Func, typename VerifyFunc>
+	void operator()( Func func, VerifyFunc verify )
 	{
 		if ( bIsValid )
 		{
@@ -31,42 +34,21 @@ struct SequentialCaller
 		}
 	}
 
-	bool operator() () const
-	{
-		return bIsValid;
-	}
+	bool operator()() const { return bIsValid; }
 
 protected:
-
 	bool bIsValid = true;
 };
 
+/*
 
-template < typename VALIDATOR, typename FUNC >
-auto CallWhile( VALIDATOR validator, FUNC func )
-{
-	return func();
-}
-
-template < typename VALIDATOR, typename FUNC, typename... FUNCS >
-auto CallWhile( VALIDATOR validator, FUNC firstFunc, FUNCS... additionalFuncs )
-{
-	auto result = firstFunc();
-
-	if ( validator( result ) )
-	{
-		return CallWhile( validator, additionalFuncs... );
-	}
-
-	return result;
-}
-
+*/
 
 D3d11Interface::D3d11Interface()
 {
-	//constexpr bool bUsingTheBadWay = true;
+	// constexpr bool bUsingTheBadWay = true;
 	//
-	//if ( bUsingTheBadWay == true )
+	// if ( bUsingTheBadWay == true )
 	//{
 	//	HRESULT result;
 	//	IDXGIFactory* dxgiFactory = nullptr;
@@ -85,8 +67,9 @@ D3d11Interface::D3d11Interface()
 	//	//D3D11_RASTERIZER_DESC rasterDesc;
 	//	//D3D11_VIEWPORT viewport;
 	//	float fieldOfView, screenAspect;
-	//	
-	//	result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
+	//
+	//	result = CreateDXGIFactory( __uuidof( IDXGIFactory ),
+	//(void**)&dxgiFactory );
 	//
 	//	if ( FAILED( result ) )
 	//	{
@@ -107,7 +90,8 @@ D3d11Interface::D3d11Interface()
 	//		return;
 	//	}
 	//
-	//	result = dxgiOutput->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr );
+	//	result = dxgiOutput->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM,
+	//DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr );
 	//
 	//	if ( FAILED( result ) || ( numModes == 0 ) )
 	//	{
@@ -127,7 +111,7 @@ D3d11Interface::D3d11Interface()
 	//}
 	//
 	//
-	//if ( bUsingTheBadWay == false )
+	// if ( bUsingTheBadWay == false )
 	//{
 	//	/*HRESULT result;
 	//	auto CheckThatFunctionWorked = [&result]
@@ -141,7 +125,8 @@ D3d11Interface::D3d11Interface()
 	//
 	//	auto CreateFactory = [&result] -> union { HRESULT, IDXGIFactory* };
 	//	{
-	//		result = CreateDXGIFactory( __uuidof( IDXGIFactory ), (void**)&dxgiFactory );
+	//		result = CreateDXGIFactory( __uuidof( IDXGIFactory ),
+	//(void**)&dxgiFactory );
 	//	};
 	//
 	//	auto EnumerateAdapters = [&result, &dxgiFactory, &dxgiAdapter]
@@ -159,4 +144,20 @@ D3d11Interface::D3d11Interface()
 	//		return false;
 	//	} );*/
 	//}
+
+	auto Validator = []( const HRESULT &result ) { return SUCCEEDED( result ); };
+
+	CallWhile( Validator,
+		[&]
+	{
+		return CreateDXGIFactory( __uuidof( IDXGIFactory ), _factory.GetRaw() );
+	}, [&]
+	{
+
+		return _factory->EnumAdapters( 0, &_adapter );
+	},
+		[]() -> void
+	{
+
+	} );
 }

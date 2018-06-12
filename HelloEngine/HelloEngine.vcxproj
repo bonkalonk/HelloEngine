@@ -72,6 +72,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)Source\Rendering\Inc;$(ProjectDir)Source\Windows\Inc;$(ProjectDir)Source\Core;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)Source\Rendering\Inc;$(ProjectDir)Source\Windows\Inc;$(ProjectDir)Source\Core;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -127,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\HighestHeader.h" />
+    <ClInclude Include="Source\Core\Utility.h" />
     <ClInclude Include="Source\Rendering\Inc\d3d11.h" />
     <ClInclude Include="Source\Windows\Inc\WindowsWindow.h" />
   </ItemGroup>
