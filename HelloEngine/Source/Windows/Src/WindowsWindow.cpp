@@ -92,6 +92,4 @@ WindowsWindow::WindowsWindow( HINSTANCE hInstance, int nCmdShow )
 
 		return;
 	}
-
-	D3d11Interface temporaryINT;
 }
