@@ -12,7 +12,8 @@ void Deck::AddCards( int cardValue, int numCards )
 {
 	for ( int i = 0; i < numCards; i++ )
 	{
-		_discardPile.push_back( cardValue );
+		//CardData newCard{ cardValue };
+		_discardPile.push_back( { cardValue } );
 		_uniqueIds.push_back( _discardPile.back()._uniqueId );
 	}
 }
@@ -31,12 +32,12 @@ Deck::Card Deck::DrawCard()
 	CardData returnCard = _drawPile.at( randomCardIndex );
 	_drawPile.erase( _drawPile.begin() + randomCardIndex );
 
-	return std::make_unique<CardRef>( returnCard, *this );
+	return CardRef( returnCard, *this );
 }
 
 void Deck::DiscardCard( const CardData& discardCard )
 {
-	_discardPile.push_back( discardCard );
+	_discardPile.insert( _discardPile.end(), discardCard );
 
 	assert( std::find( _uniqueIds.begin(), _uniqueIds.end(), discardCard._uniqueId ) != _uniqueIds.end() );
 }

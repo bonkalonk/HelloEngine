@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-
+#include <set>
+#include <vector>
 
 struct Deck
 {
@@ -10,11 +11,11 @@ protected:
 	{
 		CardData( int value ) : _value( value ), _uniqueId( _cardCount++ ) {}
 		CardData( const CardData& other ) : _value( other._value ), _uniqueId( other._uniqueId ) {}
-		//void operator = ( const CardData& other ) = delete;
-		//void operator = ( const CardData&& other ) = delete;
+		void operator = ( const CardData& other ) = delete;
+		void operator = ( const CardData&& other ) = delete;
 
-		/*const*/ int _value;
-		/*const*/ unsigned int _uniqueId;
+		const int _value;
+		const unsigned int _uniqueId;
 
 
 		bool operator == ( const CardData& other ) const
@@ -31,10 +32,11 @@ public:
 	struct CardRef
 	{
 		CardRef( const CardData& card, Deck& deck ) : _cardData( card ), _deck( deck ) {}
+		CardRef( const CardRef&& other ) : _cardData( other._cardData ), _deck( other._deck ) {}
+
 		CardRef( const CardRef& other ) = delete;
-		CardRef( const CardRef&& other ) = delete;
 		void operator = ( const CardRef& other ) = delete;
-		void operator = ( const CardRef&& other ) = delete;
+		void operator = ( const CardRef&& other ) = delete; // But should be do-able
 
 		~CardRef()
 		{
@@ -56,7 +58,7 @@ public:
 		Deck& _deck;
 	};
 
-	using Card = std::unique_ptr<CardRef>;
+	using Card = CardRef;
 
 	void AddCards( int cardValue, int numCards );
 	Card DrawCard();

@@ -1,7 +1,7 @@
 #include "../../Core/HighestHeader.h"
 
 #include "WindowsWindow.h"
-#include "d3d11.h"
+#include "DirectX11Interface.h"
 
 WindowsWindow WindowsWindow::_instance;
 
