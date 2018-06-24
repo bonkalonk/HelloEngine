@@ -12,9 +12,11 @@ void Deck::AddCards( int cardValue, int numCards )
 {
 	for ( int i = 0; i < numCards; i++ )
 	{
-		//CardData newCard{ cardValue };
-		_discardPile.push_back( { cardValue } );
-		_uniqueIds.push_back( _discardPile.back()._uniqueId );
+		CardData newCard{ cardValue };
+		//_uniqueIds.push_back( newCard._uniqueId );
+		//_discardPile.push_back( std::move( newCard ) );
+
+		_discardPile.emplace( cardValue );
 	}
 }
 
@@ -31,13 +33,13 @@ Deck::Card Deck::DrawCard()
 
 	CardData returnCard = _drawPile.at( randomCardIndex );
 	_drawPile.erase( _drawPile.begin() + randomCardIndex );
-
+	
 	return CardRef( returnCard, *this );
 }
 
 void Deck::DiscardCard( const CardData& discardCard )
 {
-	_discardPile.insert( _discardPile.end(), discardCard );
+	_discardPile.push_back( std::move( discardCard ) );
 
 	assert( std::find( _uniqueIds.begin(), _uniqueIds.end(), discardCard._uniqueId ) != _uniqueIds.end() );
 }
@@ -46,7 +48,7 @@ void Deck::FillDrawPile()
 {
 	assert( _drawPile.size() == 0 );
 	_drawPile = std::move( _discardPile );
-	_discardPile = std::vector<CardData>();
+	_discardPile = PileType();
 }
 
 bool Deck::IsEmpty() const

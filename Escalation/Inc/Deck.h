@@ -67,8 +67,9 @@ public:
 
 
 protected:
-	std::vector<CardData> _drawPile;
-	std::vector<CardData> _discardPile;
+	using PileType = std::set<CardData>;
+	PileType _drawPile;
+	PileType _discardPile;
 	std::vector<int> _uniqueIds;
 	
 	void FillDrawPile();

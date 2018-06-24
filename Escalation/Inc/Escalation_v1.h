@@ -14,7 +14,7 @@ namespace Escalation_v1
 	protected:
 		bool CanPlay( const Deck::Card& card, int remainingValue ) const
 		{
-			return card->Value() <= remainingValue;
+			return card.Value() <= remainingValue;
 		}
 
 		bool IsComplete( int currentValue, int cardValue ) const
@@ -58,7 +58,7 @@ namespace Escalation_v1
 		{
 			int currentValue = GetCurrentValue();
 
-			return EventSpecificsPolicy::IsComplete( currentValue, _eventCard->Value() );
+			return EventSpecificsPolicy::IsComplete( currentValue, _eventCard.Value() );
 		}
 
 		bool WillComplete( const Deck::Card& card ) const
@@ -82,12 +82,12 @@ namespace Escalation_v1
 		{
 			int currentValue = GetCurrentValue();
 
-			return _eventCard->Value() - currentValue;
+			return _eventCard.Value() - currentValue;
 		}
 
 		int GetTargetValue() const
 		{
-			return _eventCard->Value();
+			return _eventCard.Value();
 		}
 
 		std::vector<Deck::Card>& GetPlayedCards()
