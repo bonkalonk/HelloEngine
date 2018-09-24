@@ -1,12 +1,22 @@
 #pragma once
 
-template < typename ContainerType, typename Func >
-void ForEach( ContainerType& vector, Func func )
+
+template< typename ContainerType, typename MatchFunc, typename Func >
+void ForEachMatching(ContainerType& container, MatchFunc Match, Func Func)
 {
-	for ( auto& It : vector )
+	for (auto& It : container)
 	{
-		func( It );
+		if (Match(It))
+		{
+			Func(It);
+		}
 	}
+}
+
+template < typename ContainerType, typename Func >
+void ForEach(ContainerType& container, Func Func)
+{
+	ForEachMatching(container, [] { return true; } Func);
 }
 
 // Funcs with args attempt...
@@ -36,20 +46,81 @@ void CallWhile( Func firstFunc, Funcs... additionalFuncs )
 }*/
 
 template < typename VALIDATOR, typename FUNC >
-auto CallWhile( VALIDATOR validator, FUNC func )
+auto CallWhile(VALIDATOR validator, FUNC func)
 {
 	return func();
 }
 
 template < typename VALIDATOR, typename FUNC, typename... FUNCS >
-auto CallWhile( VALIDATOR validator, FUNC firstFunc, FUNCS... additionalFuncs )
+auto CallWhile(VALIDATOR validator, FUNC firstFunc, FUNCS... additionalFuncs)
 {
 	auto result = firstFunc();
 
-	if ( validator( result ) )
+	if (validator(result))
 	{
-		return CallWhile( validator, additionalFuncs... );
+		return CallWhile(validator, additionalFuncs...);
 	}
 
 	return result;
 }
+
+template < typename T >
+struct ScopedArrayDestructor
+{
+	constexpr static void Destroy(T*& arrayPointer)
+	{
+		if (arrayPointer)
+		{
+			delete[] arrayPointer;
+			araryPointer = nullptr;
+		}
+	}
+};
+
+template < typename T  >
+struct ReleaseAndDeleteObjectDestructor
+{
+	constexpr static void Destroy(T*& objectPointer)
+	{
+		if (objectPointer)
+		{
+			objectPointer->Release();
+			delete objectPointer;
+			objectPointer = nullptr;
+		}
+	}
+};
+
+template < typename T, typename DestroyFunction >
+struct ScopedPointer
+{
+	ScopedPointer() = default;
+	ScopedPointer(T* ptr) : _ptr(ptr) {}
+	~ScopedPointer()
+	{
+		DestroyFunction::Destroy(_ptr);
+	}
+
+	void** GetRawPtr()
+	{
+		return (void**)&_ptr;
+	}
+
+	T** GetTypedPtr()
+	{
+		return &_ptr;
+	}
+
+	T* Get() const
+	{
+		return _ptr;
+	}
+
+	T* operator -> () const
+	{
+		return Get();
+	}
+
+protected:
+	T * _ptr = nullptr;
+};
